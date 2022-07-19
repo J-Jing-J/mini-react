@@ -37,3 +37,16 @@ export function isArray(arr) {
 export function isUndefined(s) {
   return s === undefined;
 }
+
+// 把属性更新到节点上
+export function updateNode(node, nextValue) {
+  Object.keys(nextValue).forEach((k) => {
+    if(k === 'children') {
+      if(isStringOrNumber(nextValue[k])) {
+        node.textContent = nextValue[k]
+      }
+    } else {
+      node[k] = nextValue[k]
+    }
+  })
+}

@@ -1,6 +1,7 @@
+import { createFiber } from "./ReactFiber"
 import { scheduleUpdateOnFiber } from "./ReactFiberWorkLoop"
 
-// 创建root对象的类
+// 创建root对象的构造函数
 function ReactDOMRoot(internalRoot) {
   // 挂到this上，连接render函数
   this._internalRoot = internalRoot
@@ -17,6 +18,7 @@ function updateContainer (element, container) {
   const {containerInfo} = container
   // 渲染需要先创建fiber结构
   // container不需要更新，第二个参数父节点自己创建
+  // 初次渲染先创建根结点的fiber结构
   const fiber = createFiber(element, {
     type: containerInfo.nodeName.toLocaleLowerCase(),
     stateNode: containerInfo // 最终要更新到dom节点里
@@ -25,6 +27,7 @@ function updateContainer (element, container) {
   scheduleUpdateOnFiber(fiber)
 }
 
+// container就是getElementById("root")
 function createRoot(container) {
   const root = {containerInfo: container}
   return new ReactDOMRoot(root)

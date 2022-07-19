@@ -2,7 +2,7 @@ import { FunctionComponent, HostComponent } from "./ReactWorkTags"
 import { isFn, isStr, Placement } from "./utils"
 
 // vnode通过jsx拿到
-const createFiber = (vnode, returnFiber) => {
+export const createFiber = (vnode, returnFiber) => {
   const fiber = {
     type: vnode.type,
     key: vnode.key,
