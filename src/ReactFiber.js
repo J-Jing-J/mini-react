@@ -16,6 +16,10 @@ export const createFiber = (vnode, returnFiber) => {
 
     flags: Placement,  // 行为
     index: null, //记录节点在当前层级下的位置
+
+    alternate: null, // oldFiber, 用于判断是否是初次渲染，初次渲染没有oldFiber
+
+    memorizedState: null // 头hook（函数组件）
   }
 
   const {type} = vnode

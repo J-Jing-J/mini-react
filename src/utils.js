@@ -41,12 +41,39 @@ export function isUndefined(s) {
 }
 
 // 把属性更新到节点上
-export function updateNode(node, nextValue) {
+// 更新时不能简单的覆盖，因为有时候属性会变少，直接覆盖没办法删除去掉的属性
+export function updateNode(node, prevValue, nextValue) {
+
+  // 遍历老节点，清空一些属性
+  Object.keys(prevValue).forEach((k) => {
+    if(k === 'children') {
+      // 老节点子节点是文本节点，直接去掉
+      if(isStringOrNumber(nextValue[k])) {
+        node.textContent = ""
+      }
+    } else if(k.slice(0, 2) === 'on') {
+      // 老节点上的事件，去掉
+      const eventName = k.slice(2).toLocaleLowerCase()
+      node.removeEventListener(eventName, nextValue[k])
+    } else {
+      if( !(k in nextValue)) {
+        // 如果老节点的属性，新节点上没有，就删除
+        node[k] = ""
+      }
+    }
+  })
+
+  // 遍历新节点，初次渲染 、更新时覆盖属性
   Object.keys(nextValue).forEach((k) => {
     if(k === 'children') {
+      // 单独处理子节点是文本节点的状况
       if(isStringOrNumber(nextValue[k])) {
         node.textContent = nextValue[k]
       }
+    } else if(k.slice(0, 2) === 'on') {
+      // 绑定事件
+      const eventName = k.slice(2).toLocaleLowerCase()
+      node.addEventListener(eventName, nextValue[k])
     } else {
       node[k] = nextValue[k]
     }

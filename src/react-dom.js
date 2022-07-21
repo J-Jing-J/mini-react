@@ -11,7 +11,7 @@ ReactDOMRoot.prototype.render = function (children) {
   // children就是vnode, 但react工作靠的是fiber，不是vnode，还要createFiber
   const root = this._internalRoot
   // 从vnode更新到真实的dom
-  updateContainer(children, root)
+  updateContainer(children, {}, root)
 }
 
 function updateContainer (element, container) {

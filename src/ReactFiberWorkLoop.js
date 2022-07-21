@@ -1,7 +1,7 @@
 import { updateClassComponent, updateFragmentComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent } from "./ReactFiberReconciler";
 import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText } from "./ReactWorkTags"
 import { scheduleCallback } from "./scheduler";
-import { Placement } from "./utils";
+import { Placement, Update, updateNode } from "./utils";
 
 let wip = null // work in progress 正在执行的fiber
 
@@ -95,6 +95,10 @@ function commitWorker(wip) {
   // stateNode判断是否有dom节点，比如function没有dom节点
   if(flag & Placement && stateNode) {
     parentNode.appendChild(stateNode)
+  }
+  if(flag & Update && stateNode) {
+    // 更新属性
+    updateNode(stateNode, wip.alternate.props, wip.props)
   }
   // 2. 提交子节点
   commitWorker(wip.child)
