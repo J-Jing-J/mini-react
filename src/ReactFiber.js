@@ -24,7 +24,7 @@ export const createFiber = (vnode, returnFiber) => {
   } else if (isFn(type)) {
     // 函数组件 或 类组件
     fiber.tag = FunctionComponent
-  } 
+  }
 
   return fiber
 }

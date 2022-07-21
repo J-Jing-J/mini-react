@@ -1,6 +1,8 @@
 
 // flag用二进制表示：可能有多个任务，1.组合具有唯一性 2.性能好
 
+import reactDom from "./react-dom";
+
 // ! flags
 export const NoFlags = /*                      */ 0b00000000000000000000;
 // 新增、插入、移动

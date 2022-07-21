@@ -1,5 +1,6 @@
 import { updateClassComponent, updateFragmentComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent } from "./ReactFiberReconciler";
 import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText } from "./ReactWorkTags"
+import { scheduleCallback } from "./scheduler";
 import { Placement } from "./utils";
 
 let wip = null // work in progress 正在执行的fiber
@@ -13,6 +14,9 @@ export function scheduleUpdateOnFiber(fiber) {
   // 所有的fiber更新完要渲染到dom节点里
   wip = fiber;
   wipRoot = fiber
+
+  // 任务调度 接收task要执行的callback作为参数
+  scheduleCallback(workLoop)
 }
 
 // 更显当前组件
@@ -61,9 +65,10 @@ export function performUnitOfWork () {
   }
 }
 
-function workLoop (idleDeadLine) {
+
+function workLoop () {
   // timeRemaining浏览器当前的空闲时间
-  while(wip && idleDeadLine.timeRemaining() > 0) {
+  while(wip) {
     performUnitOfWork()
   }
   if(!wip && wipRoot) {
@@ -71,8 +76,8 @@ function workLoop (idleDeadLine) {
   }
 }
 
-// 在浏览器空闲时段调用函数，便于执行后台和低优先级工作，而不延迟关键事件
-requestIdleCallback(workLoop)
+// // 在浏览器空闲时段调用函数，便于执行后台和低优先级工作，而不延迟关键事件
+// requestIdleCallback(workLoop)
 
 function commitRoot() {
   commitWorker(wipRoot)

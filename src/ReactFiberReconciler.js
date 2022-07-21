@@ -9,6 +9,7 @@ export function updateHostComponent(wip) {
     // props.children是jsx的，多子节点是数组，但子节点是对象或文本
     reconcileChildren(wip, wip.props.children)
 }
+
 export function updateFunctionComponent() {}
 export function updateClassComponent() {}
 export function updateFragmentComponent() {}

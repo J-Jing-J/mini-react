@@ -19,6 +19,7 @@ function siftUp(heap, node, i) {
     // leftIndex = (prentIndex - 1) * 2 - 1
     // rightIndex = leftIndex - 1
     const parentIndex = (index - 1) >> 1
+    Number(parentIndex, 3)
     const parent = heap[parentIndex]
     if (compare(parent, node) > 0) {
       // 不符合最小堆（堆顶元素最小）
@@ -79,7 +80,8 @@ function siftDown(heap, node, i) {
         heap[leftIndex] = node;
         index = leftIndex
       }
-    } else if (right < len && compare(right, node) < 0) {
+    } // left比node大，至少证明left不是最小的
+    else if (right < len && compare(right, node) < 0) {
       heap[index] = right;
       heap[rightIndex] = node;
       index = rightIndex
@@ -87,9 +89,6 @@ function siftDown(heap, node, i) {
       // parent最小
       return
     }
-      // left比node大，至少证明left不是最小的
       
-
   }
-
 }
