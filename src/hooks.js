@@ -51,7 +51,6 @@ export function useReducer(reducer, initialState) {
     if(!currentlyRenderingFiber.alternate) {
         // 初次渲染
         hook.memorizedState = initialState
-
     }
     const dispatch = () => {
         // 传进来的reduce接受上一次的状态，返回新状态，从而修改状态值
