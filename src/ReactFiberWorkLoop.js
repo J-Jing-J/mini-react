@@ -1,3 +1,4 @@
+import { func } from "prop-types";
 import { updateClassComponent, updateFragmentComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent } from "./ReactFiberReconciler";
 import { ClassComponent, Fragment, FunctionComponent, HostComponent, HostText } from "./ReactWorkTags"
 import { scheduleCallback } from "./scheduler";
@@ -94,14 +95,89 @@ function commitWorker(wip) {
   const parentNode = wip.return.stateNode  // 不合理，有的组建没有dom节点，比如函数节点
   // stateNode判断是否有dom节点，比如function没有dom节点
   if(flag & Placement && stateNode) {
-    parentNode.appendChild(stateNode)
+    const before = getHostSibling(wip.sibling) // 找一个后面的dom节点，这样插在它前面就可以了
+    insertOrAppendPlacement(stateNode, before, parentNode)  // 判断是append还是insert
+    // parentNode.appendChild(stateNode)
   }
   if(flag & Update && stateNode) {
     // 更新属性
     updateNode(stateNode, wip.alternate.props, wip.props)
   }
+
+  if(wip.deletions) {
+    // 删除当前节点上需要删除的子节点，从当前的dom节点上删除，如果不是dom，就找父dom
+    commitDeletions(wip.deletions, stateNode || parentNode)
+  }
+
+  
+  if(wip.tag === FunctionComponent) {
+    // 如果是函数组件，需要在commit之后处理副作用
+    invokeHooks(wip) 
+
+  }
+
   // 2. 提交子节点
   commitWorker(wip.child)
   // 3. 提交兄弟
   commitWorker(wip.sibling)
+}
+
+// 删除当前节点上需要删除的子节点
+function commitDeletions(deletions, parentNode) {
+  for (let i = 0; i < deletions.length; i++) {
+    // 要删除的是dom节点，但是不是每一个fiber都有dom节点
+    parentNode.removeChild(getStateNode(deletions[i]))
+  }
+}
+
+// 获取dom节点，不是每个fiber都有dom节点
+function getStateNode(fiber) {
+  let temp = fiber
+
+  while(!temp.stateNode) {
+    // 当前节点没有dom节点，向子节点找
+    temp = temp.child
+  }
+  return temp.stateNode
+}
+
+// 找一个后面的dom节点，这样插在它前面就可以了
+function getHostSibling(sibling) {
+  while(sibling) {
+    if(sibling & stateNode && !(sibling.flag & Placement)) {
+      return sibling.stateNode
+    }
+    sibling = sibling.sibling
+  }
+  return null
+}
+
+function insertOrAppendPlacement(stateNode, before, parentNode) {
+  if(before) {
+    // 如果找到了后面的一个dom节点，就在它前面插入
+    // (如果每次都appendChild，每次都添加在父节点子节点的最后面，后面没有dom结构的时候才appendChild)
+    parentNode.insertBefore(stateNode, before)
+  } else {
+    parentNode.appendChild(stateNode)
+  }
+}
+
+function invokeHooks(wip) {
+  const {updateQueueOfEffect, updateQueueLayoutEffect} = wip
+
+  // useLayoutEffect在DOM变更后同步执行
+  for (let i = 0; i < updateQueueLayoutEffect.length; i++) {
+    const effect = updateQueueLayoutEffect[i];
+    // 执行挂载到effect对象上的create函数
+    effect.create()
+  }
+
+  // useEffect异步执行
+  for (let i = 0; i < updateQueueOfEffect.length; i++) {
+    const effect = updateQueueOfEffect[i];
+    // 利用宏任务异步执行
+    scheduleCallback(() => {
+      effect.create()
+    })
+  }
 }

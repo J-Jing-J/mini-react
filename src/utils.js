@@ -14,7 +14,7 @@ export const Deletion = /*                     */ 0b0000000000000000001000; // 8
 
 //*******************************************************************************************
 
-// ! HookFlags
+// 标记useEffect和useLayoutEffect
 export const HookLayout = /*    */ 0b010;
 export const HookPassive = /*   */ 0b100;
 
@@ -78,4 +78,24 @@ export function updateNode(node, prevValue, nextValue) {
       node[k] = nextValue[k]
     }
   })
+}
+
+
+// 比较hook的依赖项前后是不是一样，一样就不更新
+export function areHookInputsEqual(nextDeps, prevDeps) {
+  // 上次没有值，这次有值，肯定不一样
+  if(prevDeps === null) {
+    return false
+  }
+
+  // i < prevDeps.length && i < nextDeps.length 两个数组都不能越界
+  for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+    if(Object.is(prevDeps[i], nextDeps[i])) {
+      continue
+    }
+    // 只要前后有一个依赖项不同，就更新
+    return false
+  }
+
+  return true
 }
