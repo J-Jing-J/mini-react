@@ -81,7 +81,7 @@ function dispatchReducerAction(fiber, hook, reducer, action) {
     // 传进来的reduce接受上一次的状态，返回新状态，从而修改状态值
     hook.memorizedState = reducer ? reducer(hook.memorizedState) : action
     currentlyRenderingFiber.alternate = {...currentlyRenderingFiber}  //获取老fiber进行对比更新
-    fiber.sibling = null  //
+    fiber.sibling = null  
     scheduleUpdateOnFiber(currentlyRenderingFiber)  // 和初次渲染是同一个方法
 }
 

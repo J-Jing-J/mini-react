@@ -46,7 +46,6 @@ function placeChild(newFiber, lastPlacedIndex, newIndex, shouldTrackSideEffects)
         newFiber.flag |= Placement
         return lastPlacedIndex  // 返回当前值就饿醒，初次渲染没有上一次dom的最远值
     }
-
 }
 
 // 通过(old)链表构建哈希表
@@ -219,6 +218,11 @@ export function reconcileChildren(returnFiber, children) {
         shouldTrackSideEffects
     )
 
+    // old的哈希表中还有值，便利哈希表删除所有old
+    if(shouldTrackSideEffects) {
+        existingChildren.forEach(child => deleteChild(returnFiber, child))
+    }
+
     // 连接链表结构
     if(previousNewFiber === null) {
         // 从第一个元素就不相同
@@ -226,15 +230,6 @@ export function reconcileChildren(returnFiber, children) {
     } else {
         previousNewFiber.sibling = newFiber
     }
-
-    // old的哈希表中还有值，便利哈希表删除所有old
-    if(shouldTrackSideEffects) {
-        existingChildren.forEach(child => deleteChild(returnFiber, child))
-    }
-
-
-
-
 }
 
 // 节点复用：同一层级、类型相同、key相同
